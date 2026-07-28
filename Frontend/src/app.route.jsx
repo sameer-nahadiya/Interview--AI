@@ -14,6 +14,6 @@ export const router = createBrowserRouter([
     },
     {
         path: "/",
-        element: <Navigate to="/login" replace />
+        element: <h1>Home page</h1>
     }
 ])
