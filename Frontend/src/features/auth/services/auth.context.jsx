@@ -14,14 +14,19 @@ export const AuthProvider = ({ children }) =>{
                 const data = await getMe()
                 setUser(data?.user ?? null)
             } catch (err) {
-                console.error(err)
                 setUser(null)
             } finally {
                 setLoading(false)
             }
         }
 
-        getAndSetUser()
+        const hasTokenCookie = document.cookie.split(";").some(cookie => cookie.trim().startsWith("token="))
+
+        if (hasTokenCookie) {
+            getAndSetUser()
+        } else {
+            setLoading(false)
+        }
     },[])
 
     return(
