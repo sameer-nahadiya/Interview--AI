@@ -1,7 +1,7 @@
-const moongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 
-const technicalQuestionSchema = new moongoose.Schema({
+const technicalQuestionSchema = new mongoose.Schema({
     question:{
         type: String,
         require: [true, "Technical question is required"]
@@ -18,7 +18,7 @@ const technicalQuestionSchema = new moongoose.Schema({
     _id: false
 })
 
-const behaviouralQuestionSchema = new moongoose.Schema({
+const behaviouralQuestionSchema = new mongoose.Schema({
     question:{
         type: String,
         require: [true, "Technical question is required"]
@@ -35,13 +35,13 @@ const behaviouralQuestionSchema = new moongoose.Schema({
     _id: false
 })
 
-const skillGapSchema = new moongoose.Schema({
+const skillGapSchema = new mongoose.Schema({
     skill:{
         type: String,
         require: [true, "Skill is required"]
     },
     severity:{
-        type: string,
+        type: String,
         enum: ["low", "medium", "high"],
         require: [true, "Severity is required"]
     }
@@ -49,7 +49,7 @@ const skillGapSchema = new moongoose.Schema({
     _id: false
 })
 
-const preparationPlanSchema = new moongoose.Schema({
+const preparationPlanSchema = new mongoose.Schema({
     day:{
         type: Number,
         require: [ true, "Day is required"]
@@ -64,7 +64,7 @@ const preparationPlanSchema = new moongoose.Schema({
     }]
 })
 
-const interviewReportSchema = new moongoose.Schema({
+const interviewReportSchema = new mongoose.Schema({
     jobDescription:{
         type: String,
         require: [true, "Job Description is Required"]
@@ -84,12 +84,16 @@ const interviewReportSchema = new moongoose.Schema({
     technicalQuestion: [ technicalQuestionSchema],
     behavioralQuestion: [ behaviouralQuestionSchema],
     skillGaps: [ skillGapSchema],
-    prepartionSchema: [ preparationPlanSchema]
+    prepartionSchema: [ preparationPlanSchema],
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+    }
 },{
     timestamps: true
 })
 
 
-const interviewReportModel= moongoose.model("InterviewReport", interviewReportSchema)
+const interviewReportModel= mongoose.model("InterviewReport", interviewReportSchema)
 
 module.exports = interviewReportModel
