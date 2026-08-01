@@ -64,7 +64,7 @@
 // };
 
 import { useContext } from 'react';
-import { AuthContext } from '../services/auth.context.jsx';
+import { AuthContext } from '../services/auth.context.js';
 import { login, register, logout } from '../services/auth.api.js';
 
 export const useAuth = () => {
@@ -79,7 +79,8 @@ export const useAuth = () => {
     try {
       const data = await login({ email, password });
       setUser(data.user);
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,8 @@ export const useAuth = () => {
     try {
       const data = await register({ username, email, password });
       setUser(data.user);
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,8 @@ export const useAuth = () => {
     try {
       await logout();
       setUser(null);
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }

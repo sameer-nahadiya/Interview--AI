@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -8,11 +8,11 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { loading, handelRegister } = useAuth();
+  const { loading, handleRegister } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handelRegister({ username, email, password });
+    await handleRegister({ username, email, password });
     navigate('/');
   };
 
@@ -33,7 +33,7 @@ const Register = () => {
           <div className="input-group">
             <label htmlFor="username">Username</label>
             <input
-              onchange={(e) => {
+              onChange={(e) => {
                 setUsername(e.target.value);
               }}
               type="text"
@@ -45,7 +45,7 @@ const Register = () => {
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
-              onchange={(e) => {
+              onChange={(e) => {
                 setEmail(e.target.value);
               }}
               type="email"
@@ -57,8 +57,8 @@ const Register = () => {
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input
-              onchange={(e) => {
-                setPassword(e.target.vlaue);
+              onChange={(e) => {
+                setPassword(e.target.value);
               }}
               type="password"
               id="password"
