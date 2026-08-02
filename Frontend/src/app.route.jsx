@@ -7,6 +7,10 @@ import Interview from './features/interview/pages/Interview';
 
 export const router = createBrowserRouter([
   {
+    path: '/',
+    element: <Login />,
+  },
+  {
     path: '/login',
     element: <Login />,
   },
@@ -15,7 +19,7 @@ export const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: '/',
+    path: '/home',
     element: (
       <Protected>
         <Home />

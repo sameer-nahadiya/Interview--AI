@@ -1,101 +1,95 @@
-import { useState } from 'react';
+import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateResumePdf } from "../services/interview.api"
+import { useContext, useEffect } from "react"
+import { InterviewContext } from "../interview.context"
+import { useParams } from "react-router"
+
 
 export const useInterview = () => {
-  const [loading, setLoading] = useState(false);
-  const [reports, setReports] = useState([]);
-  const [report, setReport] = useState(null);
 
-  const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
-    setLoading(true);
+    const context = useContext(InterviewContext)
+    const { interviewId } = useParams()
 
-    try {
-      const newReport = {
-        _id: `${Date.now()}`,
-        title: jobDescription?.trim()
-          ? jobDescription.trim().slice(0, 40)
-          : 'Untitled Position',
-        createdAt: new Date().toISOString(),
-        matchScore: 86,
-        jobDescription,
-        selfDescription,
-        resumeFile,
-        technicalQuestions: [
-          {
-            question: 'How would you structure a React component for maintainability?',
-            intention: 'Assess component design and clarity.',
-            answer: 'Break the UI into small, focused components and keep state local where possible.',
-          },
-        ],
-        behavioralQuestions: [
-          {
-            question: 'Tell me about a time you solved a difficult problem.',
-            intention: 'Measure ownership and collaboration.',
-            answer: 'Describe the situation, your actions, and the outcome clearly.',
-          },
-        ],
-        preparationPlan: [
-          { day: 1, focus: 'Review core concepts', tasks: ['React basics', 'State management'] },
-          { day: 2, focus: 'Practice communication', tasks: ['Mock interview', 'Explain tradeoffs'] },
-        ],
-        skillGaps: [
-          { skill: 'System Design', severity: 'medium' },
-          { skill: 'TypeScript', severity: 'high' },
-        ],
-      };
-
-      setReports((prev) => [newReport, ...prev]);
-      setReport(newReport);
-      return newReport;
-    } finally {
-      setLoading(false);
+    if (!context) {
+        throw new Error("useInterview must be used within an InterviewProvider")
     }
-  };
 
-  const getReportById = async (id) => {
-    setLoading(true);
+    const { loading, setLoading, report, setReport, reports, setReports } = context
 
-    try {
-      const found = reports.find((item) => item._id === id);
-      if (found) {
-        setReport(found);
-        return found;
-      }
-
-      const fallback = {
-        _id: id,
-        title: 'Generated Interview Plan',
-        createdAt: new Date().toISOString(),
-        matchScore: 86,
-        technicalQuestions: [
-          {
-            question: 'How would you improve this app?',
-            intention: 'Assess product thinking.',
-            answer: 'Focus on user experience, maintainability, and clear feedback loops.',
-          },
-        ],
-        behavioralQuestions: [
-          {
-            question: 'Describe a challenge you overcame.',
-            intention: 'Understand resilience.',
-            answer: 'Share a concise story with clear results.',
-          },
-        ],
-        preparationPlan: [
-          { day: 1, focus: 'Review core concepts', tasks: ['Practice coding', 'Revisit fundamentals'] },
-        ],
-        skillGaps: [{ skill: 'Communication', severity: 'medium' }],
-      };
-
-      setReport(fallback);
-      return fallback;
-    } finally {
-      setLoading(false);
+    const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
+        setLoading(true)
+        let response = null
+        try {
+            response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
+            const reportData = response?.interviewReport ?? response?.data
+            setReport(reportData)
+            return reportData
+        } catch (error) {
+            console.log(error)
+            return null
+        } finally {
+            setLoading(false)
+        }
     }
-  };
 
-  const getResumePdf = async () => {
-    return null;
-  };
+    const getReportById = async (interviewId) => {
+        setLoading(true)
+        let response = null
+        try {
+            response = await getInterviewReportById(interviewId)
+            const reportData = response?.interviewReport ?? response?.data
+            setReport(reportData)
+            return reportData
+        } catch (error) {
+            console.log(error)
+            return null
+        } finally {
+            setLoading(false)
+        }
+    }
 
-  return { loading, generateReport, reports, report, getReportById, getResumePdf };
-};
+    const getReports = async () => {
+        setLoading(true)
+        let response = null
+        try {
+            response = await getAllInterviewReports()
+            const reportsData = response?.interviewReports ?? response?.reports ?? []
+            setReports(reportsData)
+            return reportsData
+        } catch (error) {
+            console.log(error)
+            return []
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const getResumePdf = async (interviewReportId) => {
+        setLoading(true)
+        let response = null
+        try {
+            response = await generateResumePdf({ interviewReportId })
+            const url = window.URL.createObjectURL(new Blob([ response ], { type: "application/pdf" }))
+            const link = document.createElement("a")
+            link.href = url
+            link.setAttribute("download", `resume_${interviewReportId}.pdf`)
+            document.body.appendChild(link)
+            link.click()
+        }
+        catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (interviewId) {
+            getReportById(interviewId)
+        } else {
+            getReports()
+        }
+    }, [ interviewId ])
+
+    return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
+
+}

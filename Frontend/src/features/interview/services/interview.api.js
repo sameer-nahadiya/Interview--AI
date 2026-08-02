@@ -5,6 +5,7 @@ const api = axios.create({
     withCredentials: true,
 })
 
+
 /**
  * @description Service to generate interview report based on user self description, resume and job description.
  */
@@ -22,7 +23,9 @@ export const generateInterviewReport = async ({ jobDescription, selfDescription,
     })
 
     return response.data
+
 }
+
 
 /**
  * @description Service to get interview report by interviewId.

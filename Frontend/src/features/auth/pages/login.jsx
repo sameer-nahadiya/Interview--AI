@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 
 const Login = () => {
-  const { loading, user, handleLogin } = useAuth();
+  const { loading, user, handleLogin, error } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -12,8 +12,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleLogin({ email, password });
-    navigate('/');
+    const result = await handleLogin({ email, password });
+
+    if (result?.user) {
+      navigate('/home');
+    }
   };
 
   if (loading) {
@@ -34,6 +37,7 @@ const Login = () => {
         <h1>Login</h1>
 
         <form onSubmit={handleSubmit}>
+          {error ? <p role="alert">{error}</p> : null}
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input

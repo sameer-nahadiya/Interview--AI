@@ -63,7 +63,7 @@
 //     return { user, loading, handleLogin, handleRegister, handleLogout };
 // };
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../services/auth.context.js';
 import { login, register, logout } from '../services/auth.api.js';
 
@@ -73,14 +73,19 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   const { user, setUser, loading, setLoading } = context;
+  const [error, setError] = useState('');
 
   const handleLogin = async ({ email, password }) => {
     setLoading(true);
+    setError('');
     try {
       const data = await login({ email, password });
-      setUser(data.user);
+      setUser(data?.user ?? null);
+      return data;
     } catch (error) {
-      console.error(error);
+      const message = error instanceof Error ? error.message : 'Login failed. Please try again.';
+      setError(message);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -88,11 +93,15 @@ export const useAuth = () => {
 
   const handleRegister = async ({ username, email, password }) => {
     setLoading(true);
+    setError('');
     try {
       const data = await register({ username, email, password });
-      setUser(data.user);
+      setUser(data?.user ?? null);
+      return data;
     } catch (error) {
-      console.error(error);
+      const message = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+      setError(message);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -100,15 +109,17 @@ export const useAuth = () => {
 
   const handleLogout = async () => {
     setLoading(true);
+    setError('');
     try {
       await logout();
       setUser(null);
     } catch (error) {
-      console.error(error);
+      const message = error instanceof Error ? error.message : 'Logout failed.';
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  return { user, loading, handleRegister, handleLogin, handleLogout };
+  return { user, loading, error, setError, handleRegister, handleLogin, handleLogout };
 };

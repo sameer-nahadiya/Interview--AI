@@ -13,7 +13,8 @@ export async function register({ username, email, password }) {
     });
     return response.data;
   } catch (err) {
-    console.log(err);
+    const message = err?.response?.data?.message || 'Registration failed. Please try again.';
+    throw new Error(message);
   }
 }
 
@@ -25,7 +26,8 @@ export async function login({ email, password }) {
     });
     return response.data;
   } catch (err) {
-    console.log(err);
+    const message = err?.response?.data?.message || 'Login failed. Please try again.';
+    throw new Error(message);
   }
 }
 
